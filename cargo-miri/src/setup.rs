@@ -15,7 +15,7 @@ use crate::util::*;
 /// done all this already.
 pub fn setup(
     subcommand: &MiriCommand,
-    target: &str,
+    targets: &[String],
     rustc_version: &VersionMeta,
     verbose: usize,
     quiet: bool,
@@ -75,10 +75,10 @@ pub fn setup(
         None =>
         // No-std heuristic taken from rust/src/bootstrap/config.rs
         // (https://github.com/rust-lang/rust/blob/25b5af1b3a0b9e2c0c57b223b2d0e3e203869b2c/src/bootstrap/config.rs#L549-L555).
-            target.contains("-none")
-                || target.contains("nvptx")
-                || target.contains("switch")
-                || target.contains("-uefi"),
+            targets.iter().any(|t| t.contains("-none")
+                || t.contains("nvptx")
+                || t.contains("switch")
+                || t.contains("-uefi")),
         Some(val) => val != "0",
     };
     let sysroot_config = if no_std {
@@ -138,7 +138,7 @@ pub fn setup(
     let mut after_build_output = String::new(); // what should be printed when the build is done.
     let notify = || {
         if !quiet {
-            eprint!("Preparing a sysroot for Miri (target: {target})");
+            eprint!("Preparing a sysroot for Miri (target: {targets:?})");
             if verbose > 0 {
                 eprint!(" in {}", sysroot_dir.display());
             }
@@ -158,7 +158,7 @@ pub fn setup(
     };
 
     // Do the build.
-    let status = SysrootBuilder::new(&sysroot_dir, target)
+    let status = SysrootBuilder::new(&sysroot_dir, targets.iter().map(|t| OsStr::new(t)))
         .build_mode(BuildMode::Check)
         .rustc_version(rustc_version.clone())
         .sysroot_config(sysroot_config)

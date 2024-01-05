@@ -97,8 +97,10 @@ pub fn phase_cargo_miri(mut args: impl Iterator<Item = String>) {
         )
     });
     let host = &rustc_version.host;
-    let target = get_arg_flag_value("--target");
-    let target = target.as_ref().unwrap_or(host);
+    let mut target: Vec<String> = get_arg_flag_values("--target").collect();
+    if target.is_empty() {
+        target = vec![host.clone()];
+    }
 
     // If cleaning the target directory & sysroot cache,
     // delete them then exit. There is no reason to setup a new
@@ -111,7 +113,7 @@ pub fn phase_cargo_miri(mut args: impl Iterator<Item = String>) {
     }
 
     // We always setup.
-    let miri_sysroot = setup(&subcommand, target, &rustc_version, verbose, quiet);
+    let miri_sysroot = setup(&subcommand, &target, &rustc_version, verbose, quiet);
 
     // Invoke actual cargo for the job, but with different flags.
     // We re-use `cargo test` and `cargo run`, which makes target and binary handling very easy but
