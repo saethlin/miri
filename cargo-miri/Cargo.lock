@@ -231,7 +231,7 @@ dependencies = [
 [[package]]
 name = "rustc-build-sysroot"
 version = "0.5.13"
-source = "git+https://github.com/saethlin/rustc-build-sysroot?branch=verbose-setup#ba449c022b1ca82d1955f3b3b0b10bafa8d67443"
+source = "git+https://github.com/saethlin/rustc-build-sysroot?branch=verbose-setup#6abc2bf70ac5d6e6f85a44aa96aa46ae6a93bee7"
 dependencies = [
  "anyhow",
  "rustc_version",
